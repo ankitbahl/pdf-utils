@@ -3,7 +3,7 @@ require 'sinatra/cors'
 require 'combine_pdf'
 
 set :allow_origin, 'https://ankitbahl.github.io/'
-set :allow_methods, 'GET,HEAD,POST'
+set :allow_methods, 'GET,HEAD,POST, OPTIONS'
 set :allow_headers, 'content-type,if-modified-since'
 set :expose_headers, 'location,link'
 
