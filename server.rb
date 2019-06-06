@@ -1,6 +1,8 @@
 require 'sinatra'
 require 'sinatra/cors'
 require 'combine_pdf'
+require 'nokogiri'
+require 'net/http'
 require './sinatra_ssl'
 
 set :allow_origin, 'https://ankitbahl.github.io'
@@ -34,4 +36,21 @@ end
 
 get '/test' do
 	'hello world'
+end
+
+get '/manga-names/:name' do
+  search_term = params['name']
+  search_term = search_term.gsub(' ', '_')
+  search_url = "https://manganelo.com/search/#{search_term}"
+  uri = URI.parse(search_url)
+  req = Net::HTTP.new(uri.host, uri.port)
+  req.use_ssl = true
+  res = req.get(uri.request_uri)
+  document = Nokogiri::HTML(res.body)
+  document.css('.story_item').map do |search_item|
+    {
+        title: search_item.css('.story_name a')[0].content,
+        url: search_item.css('a')[0].attr('href').split('/').last
+    }
+  end
 end
