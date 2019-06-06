@@ -1,4 +1,5 @@
 require 'webrick/ssl'
+require 'webrick/https'
 
 module Sinatra
   class Application
