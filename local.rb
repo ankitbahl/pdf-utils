@@ -3,17 +3,12 @@ require 'sinatra/cors'
 require 'combine_pdf'
 require 'nokogiri'
 require 'net/http'
-require './sinatra_ssl'
 
-set :allow_origin, 'https://ankitbahl.github.io'
+set :allow_origin, 'http://localhost:8000'
 set :allow_methods, 'GET,HEAD,POST, OPTIONS'
 set :allow_headers, 'content-type,if-modified-since'
 set :expose_headers, 'location,link'
-set :ssl_certificate, 'cert.crt'
-set :ssl_key, 'pkey.pem'
 set :port, 4567
-set :bind, '0.0.0.0'
-
 
 def sanitize_input(str)
   chars = str.split('')
@@ -46,10 +41,6 @@ post '/merge' do
   File.read(File.join('public', 'combined.pdf'))
 end
 
-get '/test' do
-	'hello world'
-end
-
 get '/manga-names/:name' do
   search_term = params['name']
   search_term = search_term.gsub(' ', '_')
@@ -80,7 +71,7 @@ post '/manga' do
   `touch started.t`
   args = "#{url} #{arg1} #{arg2} #{name}"
   return 'bad input!' unless sanitize_input(args)
-  command = "ruby ../MangaDownloader/downloader.rb #{args} && zip -r output.zip out && mv output.zip public/output.zip"
+  command = "ruby ../../MangaDownloader/downloader.rb #{args} && zip -r output.zip out && mv output.zip public/output.zip"
   pid = spawn(command)
   Process.detach(pid)
   return 'started'
@@ -94,4 +85,3 @@ get '/manga' do
   `rm started.t`
   File.read(File.join('public', 'output.zip'))
 end
-
