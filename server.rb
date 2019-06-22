@@ -62,13 +62,17 @@ get '/manga-names/:name' do
   document.css('.story_item').map do |search_item|
     {
         title: search_item.css('.story_name a')[0].content,
-        url: search_item.css('a')[0].attr('href').split('/').last
+        url: search_item.css('a')[0].attr('href').split('/').last,
+        pic: search_item.css('img')[0].attr('src')
     }
   end.to_json
 end
 
 post '/manga' do
   return 'job in progress' if File.exist? 'started.t'
+  `rm -rf out`
+  `rm -rf public/output.zip`
+  `rm done.t`
   url = params['url']
   name = params['name']
   arg1 = params['arg1']
@@ -80,18 +84,23 @@ post '/manga' do
   `touch started.t`
   args = "#{url} #{arg1} #{arg2} #{name}"
   return 'bad input!' unless sanitize_input(args)
-  command = "ruby ../MangaDownloader/downloader.rb #{args} && zip -r output.zip out && mv output.zip public/output.zip"
+  command = "ruby ../../MangaDownloader/downloader.rb #{args} && zip -r output.zip out && mv output.zip public/output.zip && touch done.t"
   pid = spawn(command)
   Process.detach(pid)
   return 'started'
 end
 
 get '/progress' do
-  `cat ./progress.t`
+  if File.exist? 'done.t'
+    return 'done'
+  else
+    `cat ./progress.t`
+  end
 end
 
 get '/manga' do
   `rm started.t`
-  File.read(File.join('public', 'output.zip'))
+  `rm progress.t`
+  send_file 'public/output.zip', :filename => 'output.zip', :type => 'Application/octet-stream'
 end
 
