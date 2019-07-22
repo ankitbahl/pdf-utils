@@ -21,6 +21,14 @@ webrick_options = {
 
 class Server < Sinatra::Base
 
+  configure do
+    enable :cross_origin
+  end
+
+  before do
+    response.headers['Access-Control-Allow-Origin'] = '*'
+  end
+
   def sanitize_input(str)
     chars = str.split('')
     chars.each do |c|
@@ -109,6 +117,14 @@ class Server < Sinatra::Base
     `rm -rf out`
     send_file 'public/output.zip', :filename => 'output.zip', :type => 'Application/octet-stream'
   end
+
+  options "*" do
+    response.headers["Allow"] = "GET, PUT, POST, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, Accept, X-User-Email, X-Auth-Token"
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    200
+  end
+
 end
 
 Rack::Handler::WEBrick.run Server, webrick_options
