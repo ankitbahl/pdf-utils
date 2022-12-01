@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Added at 2019-04-06 22:15:32 -0400 by ankitbahl:
-gem "sinatra", "~> 2.0"
+gem "sinatra", "~> 2.2"
 
 # Added at 2019-04-06 23:10:11 -0400 by ankitbahl:
 gem "combine_pdf", "~> 1.0"
